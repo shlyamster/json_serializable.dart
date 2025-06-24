@@ -103,6 +103,7 @@ mixin EncodeHelper implements HelperCore {
       ..writeln('=> <String, dynamic>{')
       ..writeAll(
         accessibleFields.map((field) {
+          final jsonKey = jsonKeyFor(field);
           final access = _fieldAccess(field);
 
           final keyExpression = safeNameAccess(field);
@@ -110,7 +111,7 @@ mixin EncodeHelper implements HelperCore {
 
           final maybeQuestion = _canWriteJsonWithoutNullCheck(field) ? '' : '?';
 
-          final keyValuePair = '$keyExpression: $maybeQuestion$valueExpression';
+          final keyValuePair = jsonKey.flatten ? '...$maybeQuestion$valueExpression' : '$keyExpression: $maybeQuestion$valueExpression';
           return '        $keyValuePair,\n';
         }),
       )
