@@ -149,6 +149,8 @@ class JsonKey {
   /// This is only valid for nullable enum fields.
   final Enum? unknownEnumValue;
 
+  final bool? flatten;
+
   /// Creates a new [JsonKey] instance.
   ///
   /// Use this constructor when the default behavior is not desired.
@@ -170,6 +172,7 @@ class JsonKey {
     this.required,
     this.toJson,
     this.unknownEnumValue,
+    this.flatten,
   });
 
   /// Sentinel value for use with [unknownEnumValue].

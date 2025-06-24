@@ -234,7 +234,7 @@ mixin DecodeHelper implements HelperCore {
 
         value = deserialize(
           readValueFunc == null
-              ? 'json[$jsonKeyName]'
+              ? (jsonKey.flatten ? 'json' : 'json[$jsonKeyName]')
               : '$readValueFunc(json, $jsonKeyName)',
         );
       }

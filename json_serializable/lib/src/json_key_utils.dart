@@ -271,6 +271,7 @@ KeyConfig _from(FieldElement element, ClassConfig classAnnotation) {
       'unknownEnumValue',
       mustBeEnum: true,
     ),
+    flatten: obj.read('flatten').literalValue as bool?,
     includeToJson: includeToJson,
     includeFromJson: includeFromJson,
   );
@@ -286,6 +287,7 @@ KeyConfig _populateJsonKey(
   String? readValueFunctionName,
   bool? required,
   String? unknownEnumValue,
+  bool? flatten,
   bool? includeToJson,
   bool? includeFromJson,
 }) {
@@ -311,6 +313,7 @@ KeyConfig _populateJsonKey(
     readValueFunctionName: readValueFunctionName,
     required: required ?? false,
     unknownEnumValue: unknownEnumValue,
+    flatten: flatten ?? false,
     includeFromJson: includeFromJson,
     includeToJson: includeToJson,
   );
