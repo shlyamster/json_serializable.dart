@@ -3,7 +3,7 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import 'package:analyzer/dart/constant/value.dart';
-import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/element2.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:source_gen/source_gen.dart';
@@ -171,15 +171,19 @@ _JsonConvertData? _typeConverter(
       .whereType<_ConverterMatch>()
       .toList();
 
-  var matchingAnnotations = converterMatches(ctx.fieldElement.metadata);
+  var matchingAnnotations = converterMatches(
+    ctx.fieldElement.getter2?.metadata2.annotations ?? [],
+  );
 
   if (matchingAnnotations.isEmpty) {
     matchingAnnotations = converterMatches(
-      ctx.fieldElement.getter?.metadata ?? [],
+      ctx.fieldElement.metadata2.annotations,
     );
 
     if (matchingAnnotations.isEmpty) {
-      matchingAnnotations = converterMatches(ctx.classElement.metadata);
+      matchingAnnotations = converterMatches(
+        ctx.classElement.metadata2.annotations,
+      );
 
       if (matchingAnnotations.isEmpty) {
         matchingAnnotations = ctx.config.converters
@@ -205,20 +209,20 @@ _JsonConvertData? _typeConverterFrom(
     final targetTypeCode = typeToCode(targetType);
     throw InvalidGenerationSourceError(
       'Found more than one matching converter for `$targetTypeCode`.',
-      element: matchingAnnotations[1].elementAnnotation?.element,
+      element: matchingAnnotations[1].elementAnnotation?.element2,
     );
   }
 
   final match = matchingAnnotations.single;
 
-  final annotationElement = match.elementAnnotation?.element;
-  if (annotationElement is PropertyAccessorElement) {
-    final enclosing = annotationElement.enclosingElement3;
+  final annotationElement = match.elementAnnotation?.element2;
+  if (annotationElement is PropertyAccessorElement2) {
+    final enclosing = annotationElement.enclosingElement2;
 
-    var accessString = annotationElement.name;
+    var accessString = annotationElement.name3!;
 
-    if (enclosing is ClassElement) {
-      accessString = '${enclosing.name}.$accessString';
+    if (enclosing is ClassElement2) {
+      accessString = '${enclosing.name3}.$accessString';
     }
 
     return _JsonConvertData.propertyAccess(
@@ -234,13 +238,13 @@ _JsonConvertData? _typeConverterFrom(
       reviver.positionalArguments.isNotEmpty) {
     throw InvalidGenerationSourceError(
       'Generators with constructor arguments are not supported.',
-      element: match.elementAnnotation?.element,
+      element: match.elementAnnotation?.element2,
     );
   }
 
   if (match.genericTypeArg != null) {
     return _JsonConvertData.genericClass(
-      match.annotation.type!.element!.name!,
+      match.annotation.type!.element3!.name3!,
       match.genericTypeArg!,
       reviver.accessor,
       match.jsonType,
@@ -249,7 +253,7 @@ _JsonConvertData? _typeConverterFrom(
   }
 
   return _JsonConvertData.className(
-    match.annotation.type!.element!.name!,
+    match.annotation.type!.element3!.name3!,
     reviver.accessor,
     match.jsonType,
     match.fieldType,
@@ -277,17 +281,17 @@ _ConverterMatch? _compatibleMatch(
   ElementAnnotation? annotation,
   DartObject constantValue,
 ) {
-  final converterClassElement = constantValue.type!.element as ClassElement;
+  final converterClassElement = constantValue.type!.element3 as ClassElement2;
 
   final jsonConverterSuper = converterClassElement.allSupertypes
-      .where((e) => _jsonConverterChecker.isExactly(e.element))
+      .where((e) => _jsonConverterChecker.isExactly(e.element3))
       .singleOrNull;
 
   if (jsonConverterSuper == null) {
     return null;
   }
 
-  assert(jsonConverterSuper.element.typeParameters.length == 2);
+  assert(jsonConverterSuper.element3.typeParameters2.length == 2);
   assert(jsonConverterSuper.typeArguments.length == 2);
 
   final fieldType = jsonConverterSuper.typeArguments[0];
@@ -304,13 +308,13 @@ _ConverterMatch? _compatibleMatch(
   }
 
   if (fieldType is TypeParameterType && targetType is TypeParameterType) {
-    assert(annotation?.element is! PropertyAccessorElement);
-    assert(converterClassElement.typeParameters.isNotEmpty);
-    if (converterClassElement.typeParameters.length > 1) {
+    assert(annotation?.element2 is! PropertyAccessorElement2);
+    assert(converterClassElement.typeParameters2.isNotEmpty);
+    if (converterClassElement.typeParameters2.length > 1) {
       throw InvalidGenerationSourceError(
         '`JsonConverter` implementations can have no more than one type '
-        'argument. `${converterClassElement.name}` has '
-        '${converterClassElement.typeParameters.length}.',
+        'argument. `${converterClassElement.name3}` has '
+        '${converterClassElement.typeParameters2.length}.',
         element: converterClassElement,
       );
     }
@@ -319,7 +323,7 @@ _ConverterMatch? _compatibleMatch(
       annotation,
       constantValue,
       jsonConverterSuper.typeArguments[1],
-      '${targetType.element.name}${targetType.isNullableType ? '?' : ''}',
+      '${targetType.element3.name3}${targetType.isNullableType ? '?' : ''}',
       fieldType,
     );
   }
