@@ -3,6 +3,7 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import 'package:analyzer/dart/constant/value.dart';
+import 'package:analyzer/dart/element/element2.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 /// Represents values from [JsonKey] when merged with local configuration.
@@ -60,7 +61,7 @@ class ClassConfig {
   final bool genericArgumentFactories;
   final bool ignoreUnannotated;
   final bool includeIfNull;
-  final Map<String, String> ctorParamDefaults;
+  final List<FormalParameterElement> ctorParams;
   final List<DartObject> converters;
 
   const ClassConfig({
@@ -79,7 +80,7 @@ class ClassConfig {
     required this.ignoreUnannotated,
     required this.includeIfNull,
     this.converters = const [],
-    this.ctorParamDefaults = const {},
+    this.ctorParams = const [],
   });
 
   factory ClassConfig.fromJsonSerializable(JsonSerializable config) =>
